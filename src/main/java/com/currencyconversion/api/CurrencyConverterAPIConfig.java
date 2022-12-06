@@ -15,7 +15,7 @@ public class CurrencyConverterAPIConfig {
   private String baseUrl;
 
   @Bean
-  public CurrencyConverterAPI awesomeApi() {
+  public CurrencyConverterAPI generateClient() {
     var mapper = new ObjectMapper()
       .findAndRegisterModules()
       .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
