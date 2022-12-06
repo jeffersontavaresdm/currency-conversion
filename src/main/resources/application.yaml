@@ -14,4 +14,4 @@ spring:
       ddl-auto: update
 
 api:
-  baseUrl: ""
+  baseUrl: "https://economia.awesomeapi.com.br"
