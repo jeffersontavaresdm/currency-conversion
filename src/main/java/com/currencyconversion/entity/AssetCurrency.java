@@ -75,4 +75,8 @@ public class AssetCurrency {
       asset.createDate
     );
   }
+
+  public String getCodeName() {
+    return this.getName().substring(0, this.getName().indexOf('/'));
+  }
 }

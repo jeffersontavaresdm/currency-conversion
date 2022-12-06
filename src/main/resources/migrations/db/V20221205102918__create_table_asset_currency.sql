@@ -12,4 +12,4 @@ CREATE TABLE asset_currency
     createDate       VARCHAR(255)     NOT NULL
 );
 
-CREATE UNIQUE INDEX asset_currency_code_codein_index ON asset_currency (timestamp);
+CREATE UNIQUE INDEX asset_currency_name_index ON asset_currency (name);

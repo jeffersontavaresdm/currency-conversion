@@ -9,12 +9,12 @@ import java.util.Map;
 
 public interface CurrencyConverterAPI {
 
-  @GET("/json/available/uniq")
-  Call<Map<String, String>> getTypes();
-
   @GET("/all")
   Call<Map<String, AssetCurrency>> all();
 
   @GET("/json/last/{c01}-{c02}")
-  Call<Map<String, AssetCurrency>> convert(@Path("c01") String c01, @Path("c02") String c02);
+  Call<Map<String, AssetCurrency>> convert(
+    @Path("c01") String c01,
+    @Path("c02") String c02
+  );
 }

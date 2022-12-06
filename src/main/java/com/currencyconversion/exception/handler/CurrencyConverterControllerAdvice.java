@@ -1,4 +1,4 @@
-package com.currencyconversion.exception;
+package com.currencyconversion.exception.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;

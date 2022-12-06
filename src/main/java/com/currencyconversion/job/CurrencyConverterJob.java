@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import retrofit2.Response;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 public class CurrencyConverterJob {
@@ -28,7 +28,7 @@ public class CurrencyConverterJob {
   }
 
   @Scheduled(fixedDelay = 1800000)
-  public void run() {
+  private void handle() {
     Response<Map<String, AssetCurrency>> response;
     try {
       response = api.all().execute();
@@ -44,23 +44,19 @@ public class CurrencyConverterJob {
       if (assetCurrencyMap != null && !assetCurrencyMap.isEmpty()) {
         logger.info("Creating and Updating data...");
 
-        var assets = assetCurrencyMap
-          .values()
-          .stream()
-          .map(asset -> {
-            var savedAsset = repository.getByTimestamp(asset.getTimestamp());
+        assetCurrencyMap.values().forEach(asset -> {
+          var savedAsset = repository.getByName(asset.getName());
 
-            if (savedAsset == null) {
-              logger.info("Saving a new currency type... Type: {}", asset.getCode());
-              return repository.save(asset);
-            } else {
-              logger.info("Updating a currency... Type: {}", savedAsset.getCode());
-              return repository.save(savedAsset.copy(asset));
-            }
-          }).toList();
+          if (savedAsset == null) {
+            logger.info("Saving a new currency type... Type: {}", asset.getCode());
+            repository.save(asset);
+          } else if (!Objects.equals(asset.getTimestamp(), savedAsset.getTimestamp())) {
+            logger.info("Updating a currency... Type: {}", savedAsset.getCode());
+            repository.save(savedAsset.copy(asset));
+          }
+        });
 
-        List<String> toString = assets.stream().map(AssetCurrency::toString).toList();
-        logger.info("Data created and updated successfully! Changes in: {}", String.join("\n", toString));
+        logger.info("Data created and updated successfully!");
       }
     }
   }
