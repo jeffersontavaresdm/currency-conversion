@@ -1,4 +1,4 @@
-# Currency Converter API
+# Currency Conversion API
 
 ### Small steps to start using the APITo use the API:
 
