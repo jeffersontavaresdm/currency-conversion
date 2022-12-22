@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +32,21 @@ public class CurrencyConverterService {
   }
 
   public AssetTypes types() {
-    Map<String, String> assets = new HashMap<>();
+    List<String> assetTypes = repository
+      .findAll()
+      .stream()
+      .map(asset -> asset.getCode().concat("/").concat(AssetType.valueOf(asset.getCode()).value()))
+      .toList();
 
-    repository.findAll().forEach(asset -> assets.put(asset.getCode(), AssetType.valueOf(asset.getCode()).value()));
+    logger.info("Currency Types count: {}", assetTypes.size());
 
-    return new AssetTypes(assets);
+    return new AssetTypes(assetTypes);
+    //    Map<String, String> assets = new HashMap<>();
+    //
+    //    repository.findAll().forEach(asset -> assets.put(asset.getCode(), AssetType.valueOf(asset.getCode()).value
+    //    ()));
+    //
+    //    return new AssetTypes(assets);
   }
 
   public ResponseEntity<List<AssetCurrencyDTO>> all() {

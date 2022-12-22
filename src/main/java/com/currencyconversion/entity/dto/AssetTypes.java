@@ -2,6 +2,6 @@ package com.currencyconversion.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Map;
+import java.util.List;
 
-public record AssetTypes(@JsonProperty("currency_types") Map<String, String> types) {}
+public record AssetTypes(@JsonProperty("currencyTypes") List<String> types) {}
