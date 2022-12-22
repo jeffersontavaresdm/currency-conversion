@@ -4,6 +4,7 @@ import com.currencyconversion.api.CurrencyConverterAPI;
 import com.currencyconversion.entity.AssetCurrency;
 import com.currencyconversion.entity.dto.AssetCurrencyDTO;
 import com.currencyconversion.entity.dto.AssetTypes;
+import com.currencyconversion.entity.enuns.AssetType;
 import com.currencyconversion.repository.CurrencyConverterRepository;
 import com.currencyconversion.utils.LoggerUtils;
 import org.slf4j.Logger;
@@ -32,27 +33,29 @@ public class CurrencyConverterService {
   }
 
   public AssetTypes types() {
-    Map<String, String> map = new HashMap<>();
+    Map<String, String> assets = new HashMap<>();
 
-    repository.findAll().forEach(asset -> map.put(asset.getCode(), asset.getCodeName()));
+    repository.findAll().forEach(asset -> assets.put(asset.getCode(), AssetType.valueOf(asset.getCode()).value()));
 
-    return new AssetTypes(map);
+    return new AssetTypes(assets);
   }
 
   public ResponseEntity<List<AssetCurrencyDTO>> all() {
     var assets = repository
       .findAll()
       .stream()
-      .map(AssetCurrency::assetCurrencyHandler)
+      .sorted()
+      .map(AssetCurrency::toDTO)
       .toList();
 
     return ResponseEntity.status(HttpStatus.OK).body(assets);
   }
 
-  public ResponseEntity<AssetCurrencyDTO> convert(String currencyType1, String currencyType2) {
+  public ResponseEntity<AssetCurrencyDTO> convert(AssetType currencyType1, AssetType currencyType2) {
     Response<Map<String, AssetCurrency>> response = null;
+
     try {
-      response = api.convert(currencyType1, currencyType2).execute();
+      response = api.convert(currencyType1.name(), currencyType2.name()).execute();
     } catch (IOException exception) {
       var error = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
       logger.error("Error when execute the request. Error: {}", error);
@@ -68,7 +71,33 @@ public class CurrencyConverterService {
           .findFirst()
           .get();
 
-        return ResponseEntity.status(HttpStatus.OK).body(asset.assetCurrencyHandler());
+        var currency = repository.getByName(asset.getName());
+
+        AssetCurrency assetCurrency;
+
+        if (currency != null) {
+          assetCurrency = currency.copy(
+            asset.getCode(),
+            asset.getCodeIn(),
+            asset.getName(),
+            asset.getHigh(),
+            asset.getLow(),
+            asset.getSaleValue(),
+            asset.getPercentageChange(),
+            asset.getTimestamp(),
+            asset.getCreateDate()
+          );
+
+          logger.info("AssetCurrency updating... AssetCurrency:\n{}", assetCurrency);
+
+          repository.save(assetCurrency);
+        } else {
+          assetCurrency = repository.save(asset);
+
+          logger.info("New Asset saved! AssetCurrency:\n{}", assetCurrency);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(assetCurrency.toDTO());
       }
     }
 

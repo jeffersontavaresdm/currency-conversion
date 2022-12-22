@@ -5,6 +5,7 @@ import com.currencyconversion.entity.AssetCurrency;
 import com.currencyconversion.exception.InternalErrorException;
 import com.currencyconversion.repository.CurrencyConverterRepository;
 import com.currencyconversion.utils.LoggerUtils;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 import retrofit2.Response;
 
 import java.util.Map;
-import java.util.Objects;
 
 @Component
 public class CurrencyConverterJob {
@@ -27,8 +27,9 @@ public class CurrencyConverterJob {
     this.repository = repository;
   }
 
+  @Transactional
   @Scheduled(fixedDelay = 1800000)
-  private void handle() {
+  public void handle() {
     Response<Map<String, AssetCurrency>> response;
     try {
       response = api.all().execute();
@@ -49,14 +50,28 @@ public class CurrencyConverterJob {
 
           if (savedAsset == null) {
             logger.info("Saving a new currency type... Type: {}", asset.getCode());
+
             repository.save(asset);
-          } else if (!Objects.equals(asset.getTimestamp(), savedAsset.getTimestamp())) {
+          } else {
             logger.info("Updating a currency... Type: {}", savedAsset.getCode());
-            repository.save(savedAsset.copy(asset));
+
+            AssetCurrency assetCurrency = savedAsset.copy(
+              asset.getCode(),
+              asset.getCodeIn(),
+              asset.getName(),
+              asset.getHigh(),
+              asset.getLow(),
+              asset.getSaleValue(),
+              asset.getPercentageChange(),
+              asset.getTimestamp(),
+              asset.getCreateDate()
+            );
+
+            repository.save(assetCurrency);
           }
         });
 
-        logger.info("Data created and updated successfully!");
+        logger.info("Data created or updated successfully!");
       }
     }
   }

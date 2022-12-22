@@ -2,14 +2,14 @@ package com.currencyconversion.controller;
 
 import com.currencyconversion.entity.dto.AssetCurrencyDTO;
 import com.currencyconversion.entity.dto.AssetTypes;
+import com.currencyconversion.entity.enuns.AssetType;
 import com.currencyconversion.service.CurrencyConverterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -32,8 +32,14 @@ public class CurrencyConverterController {
     return currencyConverterService.all();
   }
 
-  @GetMapping("/convert/{c1}-{c2}")
-  public ResponseEntity<AssetCurrencyDTO> convert(@PathVariable String c1, @PathVariable String c2) throws IOException {
-    return currencyConverterService.convert(c1, c2);
+  @GetMapping("/convert")
+  public ResponseEntity<AssetCurrencyDTO> convert(
+    @RequestParam("from") String currency01,
+    @RequestParam("to") String currency02
+  ) {
+    return currencyConverterService.convert(
+      AssetType.valueOf(currency01),
+      AssetType.valueOf(currency02)
+    );
   }
 }

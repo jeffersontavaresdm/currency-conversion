@@ -15,4 +15,8 @@ public interface CurrencyConverterRepository extends CrudRepository<AssetCurrenc
   List<AssetCurrency> findAll();
 
   AssetCurrency getByName(String name);
+
+  AssetCurrency findByName(String currencyType);
+
+  AssetCurrency findByCodeAndCodeIn(String currencyType1, List<String> codein);
 }

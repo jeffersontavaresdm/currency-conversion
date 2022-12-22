@@ -47,7 +47,7 @@ public class AssetCurrency {
   @JsonProperty("create_date")
   private String createDate;
 
-  public AssetCurrencyDTO assetCurrencyHandler() {
+  public AssetCurrencyDTO toDTO() {
     BigDecimal sum = new BigDecimal(this.low).add(new BigDecimal(this.high));
     BigDecimal divider = new BigDecimal("2");
     BigDecimal average = sum.divide(divider, new MathContext(5));
@@ -61,22 +61,36 @@ public class AssetCurrency {
     );
   }
 
-  public AssetCurrency copy(AssetCurrency asset) {
+  public AssetCurrency copy(
+    String code,
+    String codeIn,
+    String name,
+    Double high,
+    Double low,
+    Double saleValue,
+    Float percentageChange,
+    Long timestamp,
+    String createDate
+  ) {
     return new AssetCurrency(
       this.id,
-      asset.code,
-      asset.codeIn,
-      asset.name,
-      asset.high,
-      asset.low,
-      asset.saleValue,
-      asset.percentageChange,
-      asset.timestamp,
-      asset.createDate
+      code != null ? code : this.code,
+      codeIn != null ? codeIn : this.codeIn,
+      name != null ? name : this.name,
+      high != null ? high : this.high,
+      low != null ? low : this.low,
+      saleValue != null ? saleValue : this.saleValue,
+      percentageChange != null ? percentageChange : this.percentageChange,
+      timestamp != null ? timestamp : this.timestamp,
+      createDate != null ? createDate : this.createDate
     );
   }
 
   public String getCodeName() {
     return this.getName().substring(0, this.getName().indexOf('/'));
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 }
