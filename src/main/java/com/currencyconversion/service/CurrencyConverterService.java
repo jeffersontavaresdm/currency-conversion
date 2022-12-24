@@ -41,19 +41,12 @@ public class CurrencyConverterService {
     logger.info("Currency Types count: {}", assetTypes.size());
 
     return new AssetTypes(assetTypes);
-    //    Map<String, String> assets = new HashMap<>();
-    //
-    //    repository.findAll().forEach(asset -> assets.put(asset.getCode(), AssetType.valueOf(asset.getCode()).value
-    //    ()));
-    //
-    //    return new AssetTypes(assets);
   }
 
   public ResponseEntity<List<AssetCurrencyDTO>> all() {
     var assets = repository
       .findAll()
       .stream()
-      .sorted()
       .map(AssetCurrency::toDTO)
       .toList();
 
