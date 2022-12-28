@@ -28,8 +28,8 @@ public class CurrencyConverterController {
   }
 
   @GetMapping("/all")
-  public ResponseEntity<List<AssetCurrencyDTO>> all() {
-    return currencyConverterService.all();
+  public ResponseEntity<List<AssetCurrencyDTO>> all(@RequestParam Integer page, @RequestParam Integer limit) {
+    return currencyConverterService.all(page, limit);
   }
 
   @GetMapping("/convert")

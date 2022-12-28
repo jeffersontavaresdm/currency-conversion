@@ -8,6 +8,8 @@ import com.currencyconversion.entity.enuns.AssetType;
 import com.currencyconversion.repository.CurrencyConverterRepository;
 import com.currencyconversion.utils.LoggerUtils;
 import org.slf4j.Logger;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ public class CurrencyConverterService {
   private final Logger logger = LoggerUtils.loggerFor(this);
 
   private final CurrencyConverterAPI api;
+
   private final CurrencyConverterRepository repository;
 
   public CurrencyConverterService(CurrencyConverterAPI api, CurrencyConverterRepository repository) {
@@ -43,12 +46,15 @@ public class CurrencyConverterService {
     return new AssetTypes(assetTypes);
   }
 
-  public ResponseEntity<List<AssetCurrencyDTO>> all() {
+  public ResponseEntity<List<AssetCurrencyDTO>> all(Integer page, Integer limit) {
     var assets = repository
-      .findAll()
+      .findAll(PageRequest.of(page, limit))
       .stream()
       .map(AssetCurrency::toDTO)
       .toList();
+
+    var assetLogs = String.join("\n", assets.stream().map(Record::toString).toList());
+    logger.info("Returning a sorteable and pageable assets. Assets: {}\n{}", assets.size(), assetLogs);
 
     return ResponseEntity.status(HttpStatus.OK).body(assets);
   }
