@@ -2,6 +2,7 @@ package com.currencyconversion.controller;
 
 import com.currencyconversion.entity.dto.AssetCurrencyDTO;
 import com.currencyconversion.entity.dto.AssetTypes;
+import com.currencyconversion.entity.dto.ResponseResultDTO;
 import com.currencyconversion.entity.enuns.AssetType;
 import com.currencyconversion.service.CurrencyConverterService;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,7 +27,7 @@ public class CurrencyConverterController {
   }
 
   @GetMapping("/all")
-  public ResponseEntity<List<AssetCurrencyDTO>> all(@RequestParam Integer page, @RequestParam Integer limit) {
+  public ResponseEntity<ResponseResultDTO> all(@RequestParam Integer page, @RequestParam Integer limit) {
     return currencyConverterService.all(page, limit);
   }
 

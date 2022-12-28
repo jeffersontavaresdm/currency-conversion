@@ -4,12 +4,12 @@ import com.currencyconversion.api.CurrencyConverterAPI;
 import com.currencyconversion.entity.AssetCurrency;
 import com.currencyconversion.entity.dto.AssetCurrencyDTO;
 import com.currencyconversion.entity.dto.AssetTypes;
+import com.currencyconversion.entity.dto.ResponseResultDTO;
 import com.currencyconversion.entity.enuns.AssetType;
 import com.currencyconversion.repository.CurrencyConverterRepository;
 import com.currencyconversion.utils.LoggerUtils;
 import org.slf4j.Logger;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +46,8 @@ public class CurrencyConverterService {
     return new AssetTypes(assetTypes);
   }
 
-  public ResponseEntity<List<AssetCurrencyDTO>> all(Integer page, Integer limit) {
+  public ResponseEntity<ResponseResultDTO> all(Integer page, Integer limit) {
+    var count = repository.count();
     var assets = repository
       .findAll(PageRequest.of(page, limit))
       .stream()
@@ -54,9 +55,9 @@ public class CurrencyConverterService {
       .toList();
 
     var assetLogs = String.join("\n", assets.stream().map(Record::toString).toList());
-    logger.info("Returning a sorteable and pageable assets. Assets: {}\n{}", assets.size(), assetLogs);
+    logger.info("Returning a sorteable and pageable assets. Assets: {}\n{}", count, assetLogs);
 
-    return ResponseEntity.status(HttpStatus.OK).body(assets);
+    return ResponseEntity.status(HttpStatus.OK).body(new ResponseResultDTO(assets, count));
   }
 
   public ResponseEntity<AssetCurrencyDTO> convert(AssetType currencyType1, AssetType currencyType2) {
