@@ -31,19 +31,29 @@ public class CurrencyConverterJob {
   @Scheduled(fixedDelay = 1800000)
   public void handle() {
     Response<Map<String, AssetCurrency>> response;
+    Response<Map<String, AssetCurrency>> brlResponse;
     try {
       response = api.all().execute();
+      brlResponse = api.convert("BRL", "USD").execute();
     } catch (Exception exception) {
       var error = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
       logger.error("Error when execute the request. Error: {}", error);
       throw new InternalErrorException(error.getDetail());
     }
 
-    if (response.isSuccessful()) {
+    if (response.isSuccessful() && brlResponse.isSuccessful()) {
       Map<String, AssetCurrency> assetCurrencyMap = response.body();
 
       if (assetCurrencyMap != null && !assetCurrencyMap.isEmpty()) {
         logger.info("Creating and Updating data...");
+
+        var brl = brlResponse.body();
+
+        if (brl != null) {
+          var result = brl.values().stream().findFirst();
+
+          result.ifPresent(assetCurrency -> assetCurrencyMap.put(assetCurrency.getCode(), assetCurrency));
+        }
 
         assetCurrencyMap.values().forEach(asset -> {
           var savedAsset = repository.getByName(asset.getName());
