@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.currency-conversion</groupId>
-    <artifactId>currency-conversion</artifactId>
+    <artifactId>jeffersontdm-back</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>currency-conversion</name>
     <description>currency-conversion</description>
