@@ -1,7 +1,6 @@
 # Currency Conversion API
 
-### Small steps to start using the API:
+### Passo a passo para rodar a aplicação:
 
-<li>To get a container with PostgreSQL database, run: <u><strong>docker compose up</strong></u></li>
-<li>To maven run all processes in lifecycle until package, run: <u><strong>mvn package</strong></u></li>
-<li>To run project: <strong>mvn spring-boot: run</strong></li>
+<li>Subir o banco de dados PostgreSQL com docker, comando: <u><strong>docker compose up</strong></u></li>
+<li>Para rodar o projeto, utilize os goals do Maven: <strong>mvn clear package && mvn spring-boot: run</strong></li>
