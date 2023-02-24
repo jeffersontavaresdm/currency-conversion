@@ -11,10 +11,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.time.OffsetDateTime;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Entity
 @Getter
@@ -48,15 +49,11 @@ public class AssetCurrency {
   private String createDate;
 
   public AssetCurrencyDTO toDTO() {
-    BigDecimal sum = new BigDecimal(this.low).add(new BigDecimal(this.high));
-    BigDecimal divider = new BigDecimal("2");
-    BigDecimal average = sum.divide(divider, new MathContext(5));
-
     return new AssetCurrencyDTO(
       this.code.toUpperCase().concat("/").concat(this.name.split("/")[0]),
       this.codeIn.toUpperCase().concat("/").concat(this.name.split("/")[1]),
-      new BigDecimal(average.toString()).setScale(2, RoundingMode.HALF_DOWN).toString(),
-      new BigDecimal(this.saleValue).setScale(2, RoundingMode.HALF_UP).toString(),
+      calculate(this.high, this.codeIn.toUpperCase()),
+      calculate(this.saleValue, this.codeIn.toUpperCase()),
       OffsetDateTime.parse(this.createDate.replace(" ", "T").concat("Z"))
     );
   }
@@ -86,11 +83,16 @@ public class AssetCurrency {
     );
   }
 
-  public String getCodeName() {
-    return this.getName().substring(0, this.getName().indexOf('/'));
-  }
+  private static String calculate(double value, String type) {
+    NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale(type));
 
-  public void setName(String name) {
-    this.name = name;
+    String formatedValue = numberFormat.format(value);
+
+    Pattern pattern = Pattern.compile("\\d.*");
+    Matcher matcher = pattern.matcher(formatedValue);
+
+    boolean isFinded = matcher.find();
+
+    return isFinded ? matcher.group() : "0.0";
   }
 }
