@@ -93,6 +93,14 @@ public class AssetCurrency {
 
     boolean isFinded = matcher.find();
 
-    return isFinded ? matcher.group() : "ERRO";
+    if (isFinded) {
+      return matcher
+        .group()
+        .replace(",", "@")
+        .replace(".", ",")
+        .replace("@", ".");
+    } else {
+      return "ERRO";
+    }
   }
 }
