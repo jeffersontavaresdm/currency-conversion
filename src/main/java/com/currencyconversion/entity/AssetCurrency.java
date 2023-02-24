@@ -84,15 +84,15 @@ public class AssetCurrency {
   }
 
   private static String calculate(double value, String type) {
-    NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale(type));
-
-    String formatedValue = numberFormat.format(value);
+    String formatedValue = NumberFormat
+      .getCurrencyInstance(new Locale(type))
+      .format(value);
 
     Pattern pattern = Pattern.compile("\\d.*");
     Matcher matcher = pattern.matcher(formatedValue);
 
     boolean isFinded = matcher.find();
 
-    return isFinded ? matcher.group() : "0.0";
+    return isFinded ? matcher.group() : "ERRO";
   }
 }
